@@ -124,9 +124,20 @@ function open_(key){
   document.open();document.write(html);document.close();
   return true;
 }
+// Автовход по сохранённому ключу — только после полной загрузки страницы входа.
+// Если вызвать document.write, пока страница ещё грузится, генератор допишется
+// к форме входа, а не заменит её.
 var saved=null; try{saved=localStorage.getItem('kf3d_key');}catch(e){}
-if(saved && open_(saved)) return;
-try{localStorage.removeItem('kf3d_key');}catch(e){}
+if(saved){
+  document.documentElement.style.visibility='hidden';
+  window.addEventListener('load',function(){
+    setTimeout(function(){
+      if(open_(saved)) return;
+      try{localStorage.removeItem('kf3d_key');}catch(e){}
+      document.documentElement.style.visibility='';
+    },0);
+  });
+}
 document.getElementById('f').addEventListener('submit',function(ev){
   ev.preventDefault();
   var err=document.getElementById('err'); err.textContent='Проверяю…';
