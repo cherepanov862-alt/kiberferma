@@ -84,13 +84,14 @@ function unhex(s){var a=new Uint8Array(s.length/2);for(var i=0;i<a.length;i++)a[
 function b32(bytes,n){var bits='',s='',i;for(i=0;i<bytes.length;i++)bits+=('0000000'+bytes[i].toString(2)).slice(-8);for(i=0;i<n;i++)s+=ALPH[parseInt(bits.substr(i*5,5),2)];return s;}
 function unb32(s){var bits='',i;for(i=0;i<s.length;i++)bits+=('0000'+ALPH.indexOf(s[i]).toString(2)).slice(-5);var a=new Uint8Array(bits.length>>3);for(i=0;i<a.length;i++)a[i]=parseInt(bits.substr(i*8,8),2);return a;}
 
-// Код устройства: видеокарта, ядра, память, система, часовой пояс, сенсор. Версия браузера не входит.
+// Код устройства: видеокарта, ядра, система, часовой пояс, сенсор. Версия браузера не входит.
+// Память (deviceMemory) не берём: браузер даёт её только сайтам по https, у локального файла код вышел бы другим.
 function deviceCode(){
   var r='';
   try{var c=document.createElement('canvas'),g=c.getContext('webgl')||c.getContext('experimental-webgl');
     var x=g.getExtension('WEBGL_debug_renderer_info');r=(x?g.getParameter(x.UNMASKED_VENDOR_WEBGL)+'/'+g.getParameter(x.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER))||'';}catch(e){}
   var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';}catch(e){}
-  var s=['kf3d-dev-1',r,navigator.hardwareConcurrency||0,navigator.deviceMemory||0,navigator.platform||'',tz,navigator.maxTouchPoints||0].join('|');
+  var s=['kf3d-dev-2',r,navigator.hardwareConcurrency||0,navigator.platform||'',tz,navigator.maxTouchPoints||0].join('|');
   return b32(sha256(enc(s)),10);
 }
 var DEV=deviceCode();
